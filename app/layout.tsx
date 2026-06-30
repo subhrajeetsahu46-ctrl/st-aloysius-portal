@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="flex-grow">
           {children}
         </main>
-        <Footer /> {/* <-- ADD THIS */}
+        <Footer />
       </body>
     </html>
   )

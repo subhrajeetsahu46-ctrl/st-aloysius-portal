@@ -32,17 +32,14 @@ export function Navigation() {
         </Link>
 
         {/* Desktop Links */}
-        <nav className="hidden lg:flex items-center gap-8">
-          {['About', 'Academics', 'Life', 'Gallery', 'News'].map((item) => (
-            <Link 
-              key={item} 
-              href={`/${item.toLowerCase()}`}
-              className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium"
-            >
-              {item}
-            </Link>
-          ))}
-        </nav>
+<nav className="hidden lg:flex items-center gap-8">
+  {/* We explicitly list them to ensure they match your requirements */}
+  <Link href="/about" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">About</Link>
+  <Link href="/academics" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Academics</Link>
+  <Link href="/admissions" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Admissions</Link>
+  <Link href="/contact" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Contact</Link>
+  <Link href="/news" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">News</Link>
+</nav>
 
         {/* CTA */}
         <div className="hidden md:block">

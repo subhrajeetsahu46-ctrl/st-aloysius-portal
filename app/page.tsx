@@ -1,7 +1,7 @@
 import { Hero } from "@/components/sections/Hero"
 import { StatisticsStrip } from "@/components/sections/StatisticsStrip"
 import { HeritageIntro } from "@/components/sections/HeritageIntro"
-import { Academics } from "@/components/sections/Academics" // <-- ADD THIS
+import { Academics } from "@/components/sections/Academics"
 
 export default function Home() {
   return (
@@ -9,7 +9,7 @@ export default function Home() {
       <Hero />
       <StatisticsStrip />
       <HeritageIntro />
-      <Academics /> {/* <-- ADD THIS */}
+      <Academics />
     </main>
   )
 }

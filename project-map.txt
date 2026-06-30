@@ -1,0 +1,2202 @@
+PROJECT CODE MAP (Assets Excluded)
+==================================
+
+
+--- FILE: .env.local ---
+NEXT_PUBLIC_SANITY_DATASET="production"
+NEXT_PUBLIC_SANITY_PROJECT_ID="uyzhol0l"
+
+
+
+--- FILE: .vscode/settings.json ---
+{
+    "js/ts.tsdk.path": "node_modules/typescript/lib"
+}
+
+
+--- FILE: README.md ---
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+--- FILE: app/about/page.tsx ---
+export default function AboutPage() {
+  return (
+    <main className="min-h-screen bg-stone-50 pt-32 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-16">
+        
+        {/* Our Identity */}
+        <section className="text-center space-y-6">
+          <h1 className="text-4xl font-bold text-red-900">About St. Aloysius</h1>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            St. Aloysius Anglo Indian High School is the oldest Roman Catholic institution in Visakhapatnam. 
+            Established in 1847 and recognized by the Government in 1860, the institution was placed under 
+            the patronage of St. Aloysius in 1864. Today, it is managed by the Missionaries of St. Francis 
+            de Sales (M.S.F.S.) and caters to the educational needs of all sections of society.
+          </p>
+        </section>
+
+        {/* New Detailed Sections */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <section className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-semibold text-red-900 mb-4">Admissions & Fees</h2>
+            <p className="text-gray-700">
+              Information regarding admission procedures, academic criteria, and fee structures is 
+              available to ensure transparency for all parents.
+            </p>
+          </section>
+
+          <section className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-semibold text-red-900 mb-4">Rules & Conduct</h2>
+            <p className="text-gray-700">
+              We uphold the values of 'Virtute et Labore' (Virtue and Labour). All students are expected 
+              to adhere to the school's code of conduct to maintain a disciplined and nurturing environment.
+            </p>
+          </section>
+        </div>
+
+        {/* Syllabus Section */}
+        <section className="bg-red-900 text-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold mb-4">Academic Curriculum</h2>
+          <p className="text-red-100 mb-6">
+            Our curriculum focuses on academic excellence, character formation, and the all-round development 
+            of every student, preparing them for the challenges of competitive times.
+          </p>
+          <a href="/academics" className="bg-gold text-red-900 px-6 py-2 rounded font-bold hover:bg-yellow-400">
+            View Full Syllabus
+          </a>
+        </section>
+
+      </div>
+    </main>
+  );
+}
+
+
+--- FILE: app/admissions/page.tsx ---
+import { Button } from "@/components/ui/Button"
+import { client } from '@/sanity/lib/client'
+
+// 1. Fetch data from Sanity
+async function getAdmissions() {
+  const query = `*[_type == "admission"] | order(_createdAt asc)`
+  return await client.fetch(query)
+}
+
+export default async function AdmissionsPage() {
+  const sanitySteps = await getAdmissions()
+
+  // 2. Fallback static steps if Sanity is empty
+  const staticSteps = [
+    { stepTitle: "Inquiry", description: "Fill out our online inquiry form to express interest." },
+    { stepTitle: "Application", description: "Submit the registration form with required documents." },
+    { stepTitle: "Interaction", description: "A brief meeting with the academic coordinator." },
+    { stepTitle: "Enrollment", description: "Complete fee payment and finalize admission." }
+  ]
+
+  const steps = sanitySteps.length > 0 ? sanitySteps : staticSteps
+
+  return (
+    <main className="min-h-screen pt-32 pb-24 px-6 max-w-[1280px] mx-auto">
+      <h1 className="font-display text-4xl text-maroon mb-8">Admissions 2025-26</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
+        <div className="font-body text-lg text-charcoal space-y-6">
+          <p>We invite applications for the upcoming academic year. At St. Aloysius, we look for students who are eager to learn and ready to embrace our values of virtue and labor.</p>
+          <div className="flex gap-4">
+            <Button variant="primary">Download Prospectus</Button>
+            <Button variant="ghost">Fee Structure</Button>
+          </div>
+        </div>
+
+        {/* Admissions Steps - Now dynamic! */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {steps.map((step: any, i: number) => (
+            <div key={i} className="p-6 bg-stone-50 border border-stone-200">
+              <span className="text-yellow-600 font-bold text-3xl font-display">{i + 1}</span>
+              <h3 className="font-display text-maroon text-xl mt-2 mb-2">{step.stepTitle}</h3>
+              <p className="text-sm font-body text-gray-700">{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  )
+}
+
+
+--- FILE: app/contact/page.tsx ---
+import { client } from '@/sanity/lib/client'
+
+async function getContactData() {
+  // Fetches the site settings document
+  return await client.fetch(`*[_type == "siteSettings"][0]`)
+}
+
+export default async function ContactPage() {
+  const data = await getContactData()
+
+  return (
+    <main className="min-h-screen bg-stone-white pt-32 pb-16 px-6">
+      <div className="max-w-4xl mx-auto space-y-8">
+        <h1 className="font-display text-4xl text-maroon">Contact Us</h1>
+        
+        {/* If data exists, show it; otherwise show a fallback */}
+        <div className="font-body text-charcoal space-y-4">
+          <p className="text-lg"><strong>Campus Address:</strong></p>
+          <p>{data?.address || "Loading address..."}</p>
+          
+          <p className="text-lg"><strong>Office Hours:</strong></p>
+          <p>{data?.officeHours || "Loading hours..."}</p>
+        </div>
+      </div>
+    </main>
+  )
+}
+
+
+--- FILE: app/layout.tsx ---
+import '@/styles/globals.css'
+import type { Metadata } from 'next'
+import { EB_Garamond, Inter, Cinzel } from 'next/font/google'
+import { Navigation } from '@/components/layout/Navigation'
+import { Footer } from '@/components/layout/Footer'
+
+const garamond = EB_Garamond({ subsets: ['latin'], variable: '--font-garamond', display: 'swap' })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', display: 'swap' })
+
+export const metadata: Metadata = {
+  title: 'St. Aloysius Anglo Indian High School',
+  description: 'Est. 1847 | Visakhapatnam',
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={`${garamond.variable} ${inter.variable} ${cinzel.variable}`}>
+      <body className="antialiased bg-parchment flex flex-col min-h-screen">
+        <Navigation />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer />
+      </body>
+    </html>
+  )
+}
+
+
+
+--- FILE: app/page.tsx ---
+import { Hero } from "@/components/sections/Hero"
+import { StatisticsStrip } from "@/components/sections/StatisticsStrip"
+import { HeritageIntro } from "@/components/sections/HeritageIntro"
+import { Academics } from "@/components/sections/Academics"
+
+export default function Home() {
+  return (
+    <main>
+      <Hero />
+      <StatisticsStrip />
+      <HeritageIntro />
+      <Academics />
+    </main>
+  )
+}
+
+
+
+--- FILE: app/studio/[[...tool]]/page.tsx ---
+/**
+ * This route is responsible for the built-in authoring environment using Sanity Studio.
+ * All routes under your studio path is handled by this file using Next.js' catch-all routes:
+ * https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes
+ *
+ * You can learn more about the next-sanity package here:
+ * https://github.com/sanity-io/next-sanity
+ */
+
+import { NextStudio } from 'next-sanity/studio'
+import config from '../../../sanity.config'
+
+export const dynamic = 'force-static'
+
+export { metadata, viewport } from 'next-sanity/studio'
+
+export default function StudioPage() {
+  return <NextStudio config={config} />
+}
+
+
+
+--- FILE: components/layout/Footer.tsx ---
+import Link from "next/link"
+
+export function Footer() {
+  return (
+    <footer className="bg-charcoal text-parchment pt-20 pb-10 border-t-[8px] border-maroon">
+      <div className="max-w-[1280px] mx-auto px-6">
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          {/* Column 1: Brand */}
+          <div className="col-span-1 md:col-span-2">
+            <h3 className="font-display text-h4 text-gold mb-4">St. Aloysius Anglo Indian High School</h3>
+            <p className="font-body text-body text-parchment/70 max-w-sm">
+              Est. 1847. A legacy of knowledge, discipline, and character in the heart of Visakhapatnam.
+            </p>
+          </div>
+
+          {/* Column 2: Quick Links */}
+          <div>
+            <h4 className="font-body text-label text-gold font-bold mb-6">QUICK LINKS</h4>
+            <ul className="space-y-3 font-body text-sm text-parchment/80">
+              <li><Link href="/about" className="hover:text-gold transition-colors">Our History</Link></li>
+              <li><Link href="/academics" className="hover:text-gold transition-colors">Academics</Link></li>
+              <li><Link href="/admissions" className="hover:text-gold transition-colors">Admissions 2025-26</Link></li>
+              <li><Link href="/gallery" className="hover:text-gold transition-colors">Campus Gallery</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 3: Contact */}
+          <div>
+            <h4 className="font-body text-label text-gold font-bold mb-6">CONTACT US</h4>
+            <ul className="space-y-3 font-body text-sm text-parchment/80">
+              <li>Old Post Office, Beach Rd,</li>
+              <li>near One Town,</li>
+              <li>Visakhapatnam, AP 530001</li>
+              <li className="pt-3 hover:text-gold transition-colors">
+                <a href="tel:+918341349475">+91 83413 49475</a>
+              </li>
+              <li className="hover:text-gold transition-colors">
+                <a href="tel:+919182818682">+91 91828 18682</a>
+              </li>
+              <li className="pt-3 hover:text-gold transition-colors">
+                <a href="mailto:staloysiusvizag@gmail.com">staloysiusvizag@gmail.com</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Copyright Bar */}
+        <div className="pt-8 border-t border-parchment/10 flex flex-col md:flex-row justify-between items-center gap-4 font-body text-xs text-parchment/50">
+          <p>© {new Date().getFullYear()} St. Aloysius Anglo Indian High School. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+  )
+}
+
+
+--- FILE: components/layout/Navigation.tsx ---
+import Link from 'next/link'
+import Image from 'next/image'
+import { Button } from '../ui/Button'
+
+export function Navigation() {
+  return (
+    <header className="fixed top-0 w-full z-50 bg-stone-white/95 backdrop-blur-sm border-b border-sand/50 shadow-sm transition-all">
+      <div className="max-w-[1440px] mx-auto px-6 h-24 flex items-center justify-between">
+        
+        {/* Logo Area */}
+        <Link href="/" className="flex items-center gap-4 group">
+          
+          {/* NEW: The School Crest */}
+          <div className="relative w-12 h-14 flex-shrink-0 transition-transform group-hover:scale-105 duration-300">
+            <Image 
+              src="/crest.jpg" 
+              alt="St. Aloysius School Crest" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          
+<div className="flex flex-col justify-center">
+            <span className="font-display text-lg lg:text-xl text-maroon leading-none tracking-tight">
+              St. Aloysius Anglo Indian High School
+            </span>
+            <span className="font-body text-[10px] text-vestment uppercase tracking-widest mt-1 font-semibold">
+              Est. 1847
+            </span>
+          </div>
+        </Link>
+
+        {/* Desktop Links */}
+<nav className="hidden lg:flex items-center gap-8">
+  {/* We explicitly list them to ensure they match your requirements */}
+  <Link href="/about" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">About</Link>
+  <Link href="/academics" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Academics</Link>
+  <Link href="/admissions" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Admissions</Link>
+  <Link href="/contact" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Contact</Link>
+  <Link href="/news" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">News</Link>
+</nav>
+
+        {/* CTA */}
+        <div className="hidden md:block">
+          <Button variant="primary" className="py-3 px-6" href="/admissions">Enquire Now</Button>
+        </div>
+
+      </div>
+    </header>
+  )
+}
+
+
+--- FILE: components/sections/Academics.tsx ---
+import { Card } from "../ui/Card"
+import { Button } from "../ui/Button"
+
+export function Academics() {
+  const pillars = [
+    {
+      title: "Primary Years",
+      grade: "Classes I to V",
+      desc: "Building a strong foundation in literacy, numeracy, and character in a nurturing environment."
+    },
+    {
+      title: "Middle School",
+      grade: "Classes VI to VIII",
+      desc: "Encouraging critical thinking, independent study habits, and holistic development."
+    },
+    {
+      title: "High School",
+      grade: "Classes IX to X",
+      desc: "Rigorous academic preparation for board examinations with a focus on future readiness."
+    }
+  ]
+
+  return (
+    <section className="py-24 bg-stone-white">
+      <div className="max-w-[1280px] mx-auto px-6">
+        
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="font-display text-h3 md:text-h2 text-maroon mb-6">Academic Excellence</h2>
+          <div className="w-16 h-1 bg-gold mx-auto mb-6" />
+          <p className="font-body text-body text-charcoal/80">
+            Following the Anglo-Indian curriculum, we provide a structured, disciplined, and comprehensive education designed to unlock every student's highest potential.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {pillars.map((pillar, index) => (
+            <Card key={index} className="flex flex-col h-full">
+              <span className="text-gold font-body text-label font-bold mb-4">{pillar.grade}</span>
+              <h3 className="font-display text-h4 text-maroon mb-4">{pillar.title}</h3>
+              <p className="font-body text-body text-charcoal/80 flex-grow">{pillar.desc}</p>
+            </Card>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <Button variant="secondary" href="/academics">View Complete Syllabus</Button>
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/sections/HeritageIntro.tsx ---
+import { Button } from "../ui/Button"
+
+export function HeritageIntro() {
+  return (
+    <section className="py-24 md:py-32 bg-parchment">
+      <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        
+        {/* Left Side: Text */}
+        <div className="order-2 lg:order-1">
+          <h2 className="font-display text-h3 md:text-h2 text-maroon mb-6 leading-tight">
+            A Legacy of Academic and Moral Excellence
+          </h2>
+          <div className="w-24 h-1 bg-gold mb-8" />
+          
+          <p className="font-body text-body-lg text-charcoal mb-6 leading-relaxed">
+            Situated in the heart of Visakhapatnam, St. Aloysius Anglo Indian High School is more than just an educational institution; it is a vital piece of the city's history. 
+          </p>
+          <p className="font-body text-body text-charcoal/80 mb-10 leading-relaxed">
+            Since our founding in 1847, we have been committed to nurturing the intellectual, physical, and moral growth of our students, preparing them to lead with integrity in a rapidly changing world.
+          </p>
+          
+          <Button variant="ghost" href="/about">Read Our Full History</Button>
+        </div>
+
+        {/* Right Side: Image Placeholder */}
+        <div className="order-1 lg:order-2 relative aspect-[4/3] rounded-sm overflow-hidden shadow-card group">
+          <div className="absolute inset-0 bg-maroon/20 z-10 transition-opacity group-hover:opacity-0 duration-500" />
+          {/* Placeholder Library/Heritage Image */}
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070')] bg-cover bg-center mix-blend-multiply opacity-90 transition-transform duration-700 group-hover:scale-105" />
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/sections/Hero.tsx ---
+import { Button } from "../ui/Button"
+
+export function Hero() {
+  return (
+    <section className="relative min-h-[90vh] flex items-center justify-center pt-24 overflow-hidden bg-charcoal">
+      
+      {/* REAL SCHOOL BACKGROUND */}
+      <div className="absolute inset-0 opacity-50 bg-[url('/school-building.jpg')] bg-cover bg-center" />
+      
+      {/* Dark gradient overlay to ensure text is perfectly readable */}
+      <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/60 to-charcoal/20" />
+
+      {/* Content */}
+      <div className="relative z-10 max-w-[1024px] mx-auto px-6 text-center mt-16">
+        <span className="block font-body text-gold uppercase tracking-[0.2em] text-sm mb-6 font-semibold animate-fade-in-up">
+          Visakhapatnam's Heritage School
+        </span>
+        
+        <h1 className="font-display text-h2 md:text-display text-stone-white mb-8 leading-[1.1] animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          Shaping Character, <br />
+          <span className="italic text-parchment font-light">Inspiring Excellence.</span>
+        </h1>
+        
+        <p className="font-body text-body-lg text-parchment/80 max-w-2xl mx-auto mb-10 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          For nearly 180 years, St. Aloysius Anglo Indian High School has provided a foundation of knowledge, discipline, and community for generations of students.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          <Button variant="secondary" href="/admissions">Admissions 2025-26</Button>
+<Button variant="ghost" href="/about" className="text-stone-white border-stone-white/30 hover:border-gold hover:bg-stone-white/10">
+  Explore Our Heritage
+</Button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/sections/StatisticsStrip.tsx ---
+export function StatisticsStrip() {
+  const stats = [
+    { value: "1847", label: "Year Founded" },
+    { value: "177+", label: "Years of Excellence" },
+    { value: "100%", label: "Pass Rate" },
+    { value: "50+", label: "Dedicated Faculty" },
+  ]
+
+  return (
+    <section className="bg-maroon py-12 border-y-[6px] border-y-gold">
+      <div className="max-w-[1280px] mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x-0 md:divide-x border-gold/20">
+          {stats.map((stat, i) => (
+            <div key={i} className="flex flex-col items-center justify-center space-y-2 md:border-gold/20 md:border-l first:border-l-0">
+              <span className="text-4xl md:text-5xl font-display text-gold drop-shadow-md">
+                {stat.value}
+              </span>
+              <span className="text-[11px] md:text-xs font-body text-parchment uppercase tracking-[0.15em] font-semibold">
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/ui/Button.tsx ---
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+import React from "react"
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost'
+  href?: string // <-- NEW: We added the ability to pass a link
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = 'primary', href, ...props }, ref) => {
+    
+    const baseStyles = "inline-flex items-center justify-center rounded-sm px-8 py-4 font-body font-semibold uppercase tracking-[0.12em] text-[11px] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none text-center"
+    
+    const variants = {
+      primary: "bg-maroon text-stone-white hover:bg-charcoal",
+      secondary: "bg-gold text-stone-white hover:bg-charcoal",
+      ghost: "bg-transparent text-charcoal hover:bg-parchment border border-sand hover:border-gold",
+    }
+
+    // NEW: If an href is provided, render a Next.js Link instead of a normal button
+    if (href) {
+      return (
+        <Link href={href} className={cn(baseStyles, variants[variant], className)}>
+          {props.children}
+        </Link>
+      )
+    }
+
+    // Default: render a normal button
+    return (
+      <button
+        ref={ref}
+        className={cn(baseStyles, variants[variant], className)}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
+
+
+--- FILE: components/ui/Card.tsx ---
+import * as React from "react"
+import { cn } from "@/lib/utils"
+
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function Card({ className, children, ...props }: CardProps) {
+  return (
+    <div
+      className={cn(
+        "bg-stone-white border border-sand/30 rounded-sm p-8 shadow-sm hover:shadow-md transition-shadow duration-300 relative overflow-hidden group",
+        className
+      )}
+      {...props}
+    >
+      {/* Gold accent line at the top that expands on hover */}
+      <div className="absolute top-0 left-0 w-0 h-1 bg-gold transition-all duration-500 group-hover:w-full" />
+      {children}
+    </div>
+  )
+}
+
+
+
+--- FILE: eslint.config.mjs ---
+import { defineConfig, globalIgnores } from 'eslint/config'
+import nextVitals from 'eslint-config-next/core-web-vitals'
+
+const eslintConfig = defineConfig([
+  ...nextVitals,
+  globalIgnores([
+    '.next/**',
+    'out/**',
+    'build/**',
+    'next-env.d.ts',
+  ]),
+])
+
+export default eslintConfig
+
+
+
+--- FILE: generate-map.js ---
+const fs = require('fs');
+const path = require('path');
+
+const outputFile = 'project-map.txt';
+const projectRoot = './'; 
+
+// Folders/Files to ignore
+const ignore = ['node_modules', '.next', '.git', '.sanity', 'package-lock.json', '.gitignore'];
+// Extensions to skip (binary/assets)
+const skipExtensions = ['.ico', '.png', '.jpg', '.jpeg', '.svg', '.gif'];
+
+function getFiles(dir, fileList = []) {
+  const files = fs.readdirSync(dir);
+  files.forEach(file => {
+    if (ignore.includes(file)) return;
+    const filePath = path.join(dir, file);
+    
+    if (fs.statSync(filePath).isDirectory()) {
+      getFiles(filePath, fileList);
+    } else {
+      const ext = path.extname(file).toLowerCase();
+      if (!skipExtensions.includes(ext)) {
+        fileList.push(filePath);
+      }
+    }
+  });
+  return fileList;
+}
+
+const allFiles = getFiles(projectRoot);
+let output = 'PROJECT CODE MAP (Assets Excluded)\n==================================\n\n';
+
+allFiles.forEach(file => {
+  output += `\n--- FILE: ${file} ---\n`;
+  try {
+    output += fs.readFileSync(file, 'utf8');
+  } catch (err) {
+    output += '[Could not read file]';
+  }
+  output += '\n\n';
+});
+
+fs.writeFileSync(outputFile, output);
+console.log(`Success! Your clean code map is saved in ${outputFile}`);
+
+
+--- FILE: lib/utils.ts ---
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+
+--- FILE: next-env.d.ts ---
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+import "./.next/dev/types/routes.d.ts";
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+
+
+
+--- FILE: next.config.mjs ---
+/** @type {import('next').NextConfig} */
+const nextConfig = {
+  images: {
+    remotePatterns: [
+      {
+        protocol: 'https',
+        hostname: 'cdn.sanity.io',
+      },
+    ],
+    formats: ['image/webp'],
+  },
+
+  async headers() {
+    return [
+      {
+        source: '/(.*)',
+        headers: [
+          { key: 'X-Frame-Options', value: 'DENY' },
+          { key: 'X-Content-Type-Options', value: 'nosniff' },
+          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
+          { key: 'Permissions-Policy', value: 'camera=(), microphone=()' },
+        ],
+      },
+    ]
+  },
+}
+
+export default nextConfig
+
+
+
+--- FILE: package.json ---
+{
+  "name": "project-renaissance",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint",
+    "type-check": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@sanity/icons": "^3.7.4",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.2.0",
+    "clsx": "^2.1.1",
+    "next": "^16.2.9",
+    "next-sanity": "^13.1.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "sanity": "^6.2.0",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^19",
+    "@types/react-dom": "^19",
+    "eslint": "^9",
+    "eslint-config-next": "^16.2.9",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
+
+
+
+--- FILE: postcss.config.mjs ---
+/** @type {import('postcss-load-config').Config} */
+const config = {
+  plugins: {
+    tailwindcss: {},
+  },
+};
+
+export default config;
+
+
+
+--- FILE: project-map.txt ---
+PROJECT CODE MAP (Assets Excluded)
+==================================
+
+
+--- FILE: .env.local ---
+NEXT_PUBLIC_SANITY_DATASET="production"
+NEXT_PUBLIC_SANITY_PROJECT_ID="uyzhol0l"
+
+
+
+--- FILE: .eslintrc.json ---
+{
+  "extends": ["next/core-web-vitals", "next/typescript"]
+}
+
+
+
+--- FILE: .vscode/settings.json ---
+{
+    "js/ts.tsdk.path": "node_modules/typescript/lib"
+}
+
+
+--- FILE: README.md ---
+This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+
+## Getting Started
+
+First, run the development server:
+
+```bash
+npm run dev
+# or
+yarn dev
+# or
+pnpm dev
+# or
+bun dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+
+You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+
+This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+
+## Learn More
+
+To learn more about Next.js, take a look at the following resources:
+
+- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
+- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+
+You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+
+## Deploy on Vercel
+
+The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+
+Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+
+
+
+--- FILE: app/about/page.tsx ---
+export default function AboutPage() {
+  return (
+    <main className="min-h-screen bg-stone-50 pt-32 pb-16 px-4 sm:px-6 lg:px-8">
+      <div className="max-w-4xl mx-auto space-y-16">
+        
+        {/* Our Identity */}
+        <section className="text-center space-y-6">
+          <h1 className="text-4xl font-bold text-red-900">About St. Aloysius</h1>
+          <p className="text-lg text-gray-700 leading-relaxed">
+            St. Aloysius Anglo Indian High School is the oldest Roman Catholic institution in Visakhapatnam. 
+            Established in 1847 and recognized by the Government in 1860, the institution was placed under 
+            the patronage of St. Aloysius in 1864. Today, it is managed by the Missionaries of St. Francis 
+            de Sales (M.S.F.S.) and caters to the educational needs of all sections of society.
+          </p>
+        </section>
+
+        {/* New Detailed Sections */}
+        <div className="grid md:grid-cols-2 gap-8">
+          <section className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-semibold text-red-900 mb-4">Admissions & Fees</h2>
+            <p className="text-gray-700">
+              Information regarding admission procedures, academic criteria, and fee structures is 
+              available to ensure transparency for all parents.
+            </p>
+          </section>
+
+          <section className="bg-white p-8 rounded-lg shadow-sm border border-gray-100">
+            <h2 className="text-2xl font-semibold text-red-900 mb-4">Rules & Conduct</h2>
+            <p className="text-gray-700">
+              We uphold the values of 'Virtute et Labore' (Virtue and Labour). All students are expected 
+              to adhere to the school's code of conduct to maintain a disciplined and nurturing environment.
+            </p>
+          </section>
+        </div>
+
+        {/* Syllabus Section */}
+        <section className="bg-red-900 text-white p-8 rounded-lg shadow-lg">
+          <h2 className="text-2xl font-semibold mb-4">Academic Curriculum</h2>
+          <p className="text-red-100 mb-6">
+            Our curriculum focuses on academic excellence, character formation, and the all-round development 
+            of every student, preparing them for the challenges of competitive times.
+          </p>
+          <a href="/academics" className="bg-gold text-red-900 px-6 py-2 rounded font-bold hover:bg-yellow-400">
+            View Full Syllabus
+          </a>
+        </section>
+
+      </div>
+    </main>
+  );
+}
+
+
+--- FILE: app/admissions/page.tsx ---
+import { Button } from "@/components/ui/Button"
+import { client } from '@/sanity/lib/client'
+
+// 1. Fetch data from Sanity
+async function getAdmissions() {
+  const query = `*[_type == "admission"] | order(_createdAt asc)`
+  return await client.fetch(query)
+}
+
+export default async function AdmissionsPage() {
+  const sanitySteps = await getAdmissions()
+
+  // 2. Fallback static steps if Sanity is empty
+  const staticSteps = [
+    { stepTitle: "Inquiry", description: "Fill out our online inquiry form to express interest." },
+    { stepTitle: "Application", description: "Submit the registration form with required documents." },
+    { stepTitle: "Interaction", description: "A brief meeting with the academic coordinator." },
+    { stepTitle: "Enrollment", description: "Complete fee payment and finalize admission." }
+  ]
+
+  const steps = sanitySteps.length > 0 ? sanitySteps : staticSteps
+
+  return (
+    <main className="min-h-screen pt-32 pb-24 px-6 max-w-[1280px] mx-auto">
+      <h1 className="font-display text-4xl text-maroon mb-8">Admissions 2025-26</h1>
+      
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-16 mb-16">
+        <div className="font-body text-lg text-charcoal space-y-6">
+          <p>We invite applications for the upcoming academic year. At St. Aloysius, we look for students who are eager to learn and ready to embrace our values of virtue and labor.</p>
+          <div className="flex gap-4">
+            <Button variant="primary">Download Prospectus</Button>
+            <Button variant="ghost">Fee Structure</Button>
+          </div>
+        </div>
+
+        {/* Admissions Steps - Now dynamic! */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          {steps.map((step: any, i: number) => (
+            <div key={i} className="p-6 bg-stone-50 border border-stone-200">
+              <span className="text-yellow-600 font-bold text-3xl font-display">{i + 1}</span>
+              <h3 className="font-display text-maroon text-xl mt-2 mb-2">{step.stepTitle}</h3>
+              <p className="text-sm font-body text-gray-700">{step.description}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </main>
+  )
+}
+
+
+--- FILE: app/contact/page.tsx ---
+// 1. TOP: Imports go first
+import { client } from '@/sanity/lib/client'
+
+// 2. MIDDLE: Define the fetch function
+async function getContactData() {
+  return await client.fetch(`*[_type == "siteSettings"][0]`)
+}
+
+// 3. BOTTOM: The page component
+export default async function ContactPage() {
+  const data = await getContactData() // This now works because the function above exists
+
+  return (
+    <main>
+      <h1>Contact Us</h1>
+      {/* ... your content ... */}
+    </main>
+  )
+}
+
+
+--- FILE: app/layout.tsx ---
+import '@/styles/globals.css'
+import type { Metadata } from 'next'
+import { EB_Garamond, Inter, Cinzel } from 'next/font/google'
+import { Navigation } from '@/components/layout/Navigation'
+import { Footer } from '@/components/layout/Footer'
+
+const garamond = EB_Garamond({ subsets: ['latin'], variable: '--font-garamond', display: 'swap' })
+const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' })
+const cinzel = Cinzel({ subsets: ['latin'], variable: '--font-cinzel', display: 'swap' })
+
+export const metadata: Metadata = {
+  title: 'St. Aloysius Anglo Indian High School',
+  description: 'Est. 1847 | Visakhapatnam',
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" className={`${garamond.variable} ${inter.variable} ${cinzel.variable}`}>
+      <body className="antialiased bg-parchment flex flex-col min-h-screen">
+        <Navigation />
+        <main className="flex-grow">
+          {children}
+        </main>
+        <Footer /> {/* <-- ADD THIS */}
+      </body>
+    </html>
+  )
+}
+
+
+
+--- FILE: app/page.tsx ---
+import { Hero } from "@/components/sections/Hero"
+import { StatisticsStrip } from "@/components/sections/StatisticsStrip"
+import { HeritageIntro } from "@/components/sections/HeritageIntro"
+import { Academics } from "@/components/sections/Academics" // <-- ADD THIS
+
+export default function Home() {
+  return (
+    <main>
+      <Hero />
+      <StatisticsStrip />
+      <HeritageIntro />
+      <Academics /> {/* <-- ADD THIS */}
+    </main>
+  )
+}
+
+
+--- FILE: app/studio/[[...tool]]/page.tsx ---
+/**
+ * This route is responsible for the built-in authoring environment using Sanity Studio.
+ * All routes under your studio path is handled by this file using Next.js' catch-all routes:
+ * https://nextjs.org/docs/routing/dynamic-routes#catch-all-routes
+ *
+ * You can learn more about the next-sanity package here:
+ * https://github.com/sanity-io/next-sanity
+ */
+
+import { NextStudio } from 'next-sanity/studio'
+import config from '../../../sanity.config'
+
+export const dynamic = 'force-static'
+
+export { metadata, viewport } from 'next-sanity/studio'
+
+export default function StudioPage() {
+  return <NextStudio config={config} />
+}
+
+
+
+--- FILE: components/layout/Footer.tsx ---
+import Link from "next/link"
+
+export function Footer() {
+  return (
+    <footer className="bg-charcoal text-parchment pt-20 pb-10 border-t-[8px] border-maroon">
+      <div className="max-w-[1280px] mx-auto px-6">
+        
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-12 mb-16">
+          {/* Column 1: Brand */}
+          <div className="col-span-1 md:col-span-2">
+            <h3 className="font-display text-h4 text-gold mb-4">St. Aloysius Anglo Indian High School</h3>
+            <p className="font-body text-body text-parchment/70 max-w-sm">
+              Est. 1847. A legacy of knowledge, discipline, and character in the heart of Visakhapatnam.
+            </p>
+          </div>
+
+          {/* Column 2: Quick Links */}
+          <div>
+            <h4 className="font-body text-label text-gold font-bold mb-6">QUICK LINKS</h4>
+            <ul className="space-y-3 font-body text-sm text-parchment/80">
+              <li><Link href="/about" className="hover:text-gold transition-colors">Our History</Link></li>
+              <li><Link href="/academics" className="hover:text-gold transition-colors">Academics</Link></li>
+              <li><Link href="/admissions" className="hover:text-gold transition-colors">Admissions 2025-26</Link></li>
+              <li><Link href="/gallery" className="hover:text-gold transition-colors">Campus Gallery</Link></li>
+            </ul>
+          </div>
+
+          {/* Column 3: Contact */}
+          <div>
+            <h4 className="font-body text-label text-gold font-bold mb-6">CONTACT US</h4>
+            <ul className="space-y-3 font-body text-sm text-parchment/80">
+              <li>Old Post Office, Beach Rd,</li>
+              <li>near One Town,</li>
+              <li>Visakhapatnam, AP 530001</li>
+              <li className="pt-3 hover:text-gold transition-colors">
+                <a href="tel:+918341349475">+91 83413 49475</a>
+              </li>
+              <li className="hover:text-gold transition-colors">
+                <a href="tel:+919182818682">+91 91828 18682</a>
+              </li>
+              <li className="pt-3 hover:text-gold transition-colors">
+                <a href="mailto:staloysiusvizag@gmail.com">staloysiusvizag@gmail.com</a>
+              </li>
+            </ul>
+          </div>
+        </div>
+
+        {/* Bottom Copyright Bar */}
+        <div className="pt-8 border-t border-parchment/10 flex flex-col md:flex-row justify-between items-center gap-4 font-body text-xs text-parchment/50">
+          <p>© {new Date().getFullYear()} St. Aloysius Anglo Indian High School. All rights reserved.</p>
+          <div className="flex gap-6">
+            <Link href="/privacy" className="hover:text-gold transition-colors">Privacy Policy</Link>
+          </div>
+        </div>
+
+      </div>
+    </footer>
+  )
+}
+
+
+--- FILE: components/layout/Navigation.tsx ---
+import Link from 'next/link'
+import Image from 'next/image'
+import { Button } from '../ui/Button'
+
+export function Navigation() {
+  return (
+    <header className="fixed top-0 w-full z-50 bg-stone-white/95 backdrop-blur-sm border-b border-sand/50 shadow-sm transition-all">
+      <div className="max-w-[1440px] mx-auto px-6 h-24 flex items-center justify-between">
+        
+        {/* Logo Area */}
+        <Link href="/" className="flex items-center gap-4 group">
+          
+          {/* NEW: The School Crest */}
+          <div className="relative w-12 h-14 flex-shrink-0 transition-transform group-hover:scale-105 duration-300">
+            <Image 
+              src="/crest.jpg" 
+              alt="St. Aloysius School Crest" 
+              fill
+              className="object-contain"
+              priority
+            />
+          </div>
+          
+<div className="flex flex-col justify-center">
+            <span className="font-display text-lg lg:text-xl text-maroon leading-none tracking-tight">
+              St. Aloysius Anglo Indian High School
+            </span>
+            <span className="font-body text-[10px] text-vestment uppercase tracking-widest mt-1 font-semibold">
+              Est. 1847
+            </span>
+          </div>
+        </Link>
+
+        {/* Desktop Links */}
+<nav className="hidden lg:flex items-center gap-8">
+  {/* We explicitly list them to ensure they match your requirements */}
+  <Link href="/about" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">About</Link>
+  <Link href="/academics" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Academics</Link>
+  <Link href="/admissions" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Admissions</Link>
+  <Link href="/contact" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">Contact</Link>
+  <Link href="/news" className="font-body text-sm text-charcoal hover:text-gold transition-colors font-medium">News</Link>
+</nav>
+
+        {/* CTA */}
+        <div className="hidden md:block">
+          <Button variant="primary" className="py-3 px-6" href="/admissions">Enquire Now</Button>
+        </div>
+
+      </div>
+    </header>
+  )
+}
+
+
+--- FILE: components/sections/Academics.tsx ---
+import { Card } from "../ui/Card"
+import { Button } from "../ui/Button"
+
+export function Academics() {
+  const pillars = [
+    {
+      title: "Primary Years",
+      grade: "Classes I to V",
+      desc: "Building a strong foundation in literacy, numeracy, and character in a nurturing environment."
+    },
+    {
+      title: "Middle School",
+      grade: "Classes VI to VIII",
+      desc: "Encouraging critical thinking, independent study habits, and holistic development."
+    },
+    {
+      title: "High School",
+      grade: "Classes IX to X",
+      desc: "Rigorous academic preparation for board examinations with a focus on future readiness."
+    }
+  ]
+
+  return (
+    <section className="py-24 bg-stone-white">
+      <div className="max-w-[1280px] mx-auto px-6">
+        
+        <div className="text-center max-w-3xl mx-auto mb-16">
+          <h2 className="font-display text-h3 md:text-h2 text-maroon mb-6">Academic Excellence</h2>
+          <div className="w-16 h-1 bg-gold mx-auto mb-6" />
+          <p className="font-body text-body text-charcoal/80">
+            Following the Anglo-Indian curriculum, we provide a structured, disciplined, and comprehensive education designed to unlock every student's highest potential.
+          </p>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mb-12">
+          {pillars.map((pillar, index) => (
+            <Card key={index} className="flex flex-col h-full">
+              <span className="text-gold font-body text-label font-bold mb-4">{pillar.grade}</span>
+              <h3 className="font-display text-h4 text-maroon mb-4">{pillar.title}</h3>
+              <p className="font-body text-body text-charcoal/80 flex-grow">{pillar.desc}</p>
+            </Card>
+          ))}
+        </div>
+
+        <div className="text-center">
+          <Button variant="secondary" href="/academics">View Complete Syllabus</Button>
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/sections/HeritageIntro.tsx ---
+import { Button } from "../ui/Button"
+
+export function HeritageIntro() {
+  return (
+    <section className="py-24 md:py-32 bg-parchment">
+      <div className="max-w-[1280px] mx-auto px-6 grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-24 items-center">
+        
+        {/* Left Side: Text */}
+        <div className="order-2 lg:order-1">
+          <h2 className="font-display text-h3 md:text-h2 text-maroon mb-6 leading-tight">
+            A Legacy of Academic and Moral Excellence
+          </h2>
+          <div className="w-24 h-1 bg-gold mb-8" />
+          
+          <p className="font-body text-body-lg text-charcoal mb-6 leading-relaxed">
+            Situated in the heart of Visakhapatnam, St. Aloysius Anglo Indian High School is more than just an educational institution; it is a vital piece of the city's history. 
+          </p>
+          <p className="font-body text-body text-charcoal/80 mb-10 leading-relaxed">
+            Since our founding in 1847, we have been committed to nurturing the intellectual, physical, and moral growth of our students, preparing them to lead with integrity in a rapidly changing world.
+          </p>
+          
+          <Button variant="ghost" href="/about">Read Our Full History</Button>
+        </div>
+
+        {/* Right Side: Image Placeholder */}
+        <div className="order-1 lg:order-2 relative aspect-[4/3] rounded-sm overflow-hidden shadow-card group">
+          <div className="absolute inset-0 bg-maroon/20 z-10 transition-opacity group-hover:opacity-0 duration-500" />
+          {/* Placeholder Library/Heritage Image */}
+          <div className="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1577896851231-70ef18881754?q=80&w=2070')] bg-cover bg-center mix-blend-multiply opacity-90 transition-transform duration-700 group-hover:scale-105" />
+        </div>
+
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/sections/Hero.tsx ---
+import { Button } from "../ui/Button"
+
+export function Hero() {
+  return (
+    <section className="relative min-h-[90vh] flex items-center justify-center pt-24 overflow-hidden bg-charcoal">
+      
+      {/* REAL SCHOOL BACKGROUND */}
+      <div className="absolute inset-0 opacity-50 bg-[url('/school-building.jpg')] bg-cover bg-center" />
+      
+      {/* Dark gradient overlay to ensure text is perfectly readable */}
+      <div className="absolute inset-0 bg-gradient-to-t from-charcoal via-charcoal/60 to-charcoal/20" />
+
+      {/* Content */}
+      <div className="relative z-10 max-w-[1024px] mx-auto px-6 text-center mt-16">
+        <span className="block font-body text-gold uppercase tracking-[0.2em] text-sm mb-6 font-semibold animate-fade-in-up">
+          Visakhapatnam's Heritage School
+        </span>
+        
+        <h1 className="font-display text-h2 md:text-display text-stone-white mb-8 leading-[1.1] animate-fade-in-up" style={{ animationDelay: '100ms' }}>
+          Shaping Character, <br />
+          <span className="italic text-parchment font-light">Inspiring Excellence.</span>
+        </h1>
+        
+        <p className="font-body text-body-lg text-parchment/80 max-w-2xl mx-auto mb-10 animate-fade-in-up" style={{ animationDelay: '200ms' }}>
+          For nearly 180 years, St. Aloysius Anglo Indian High School has provided a foundation of knowledge, discipline, and community for generations of students.
+        </p>
+        
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-4 animate-fade-in-up" style={{ animationDelay: '300ms' }}>
+          <Button variant="secondary" href="/admissions">Admissions 2025-26</Button>
+<Button variant="ghost" href="/about" className="text-stone-white border-stone-white/30 hover:border-gold hover:bg-stone-white/10">
+  Explore Our Heritage
+</Button>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/sections/StatisticsStrip.tsx ---
+export function StatisticsStrip() {
+  const stats = [
+    { value: "1847", label: "Year Founded" },
+    { value: "177+", label: "Years of Excellence" },
+    { value: "100%", label: "Pass Rate" },
+    { value: "50+", label: "Dedicated Faculty" },
+  ]
+
+  return (
+    <section className="bg-maroon py-12 border-y-[6px] border-y-gold">
+      <div className="max-w-[1280px] mx-auto px-6">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 text-center divide-x-0 md:divide-x border-gold/20">
+          {stats.map((stat, i) => (
+            <div key={i} className="flex flex-col items-center justify-center space-y-2 md:border-gold/20 md:border-l first:border-l-0">
+              <span className="text-4xl md:text-5xl font-display text-gold drop-shadow-md">
+                {stat.value}
+              </span>
+              <span className="text-[11px] md:text-xs font-body text-parchment uppercase tracking-[0.15em] font-semibold">
+                {stat.label}
+              </span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+
+--- FILE: components/ui/Button.tsx ---
+import { cn } from "@/lib/utils"
+import Link from "next/link"
+import React from "react"
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: 'primary' | 'secondary' | 'ghost'
+  href?: string // <-- NEW: We added the ability to pass a link
+}
+
+export const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant = 'primary', href, ...props }, ref) => {
+    
+    const baseStyles = "inline-flex items-center justify-center rounded-sm px-8 py-4 font-body font-semibold uppercase tracking-[0.12em] text-[11px] transition-all duration-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-gold focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none text-center"
+    
+    const variants = {
+      primary: "bg-maroon text-stone-white hover:bg-charcoal",
+      secondary: "bg-gold text-stone-white hover:bg-charcoal",
+      ghost: "bg-transparent text-charcoal hover:bg-parchment border border-sand hover:border-gold",
+    }
+
+    // NEW: If an href is provided, render a Next.js Link instead of a normal button
+    if (href) {
+      return (
+        <Link href={href} className={cn(baseStyles, variants[variant], className)}>
+          {props.children}
+        </Link>
+      )
+    }
+
+    // Default: render a normal button
+    return (
+      <button
+        ref={ref}
+        className={cn(baseStyles, variants[variant], className)}
+        {...props}
+      />
+    )
+  }
+)
+Button.displayName = "Button"
+
+
+--- FILE: components/ui/Card.tsx ---
+import { cn } from "@/lib/utils"
+
+interface CardProps extends React.HTMLAttributes<HTMLDivElement> {}
+
+export function Card({ className, children, ...props }: CardProps) {
+  return (
+    <div className={cn("bg-stone-white border border-sand/30 rounded-sm p-8 shadow-sm hover:shadow-md transition-shadow duration-300 relative overflow-hidden group", className)} {...props}>
+      {/* Gold accent line at the top that expands on hover */}
+      <div className="absolute top-0 left-0 w-0 h-1 bg-gold transition-all duration-500 group-hover:w-full" />
+      {children}
+    </div>
+  )
+}
+
+
+--- FILE: generate-map.js ---
+const fs = require('fs');
+const path = require('path');
+
+const outputFile = 'project-map.txt';
+const projectRoot = './'; 
+
+// Folders/Files to ignore
+const ignore = ['node_modules', '.next', '.git', '.sanity', 'package-lock.json', '.gitignore'];
+// Extensions to skip (binary/assets)
+const skipExtensions = ['.ico', '.png', '.jpg', '.jpeg', '.svg', '.gif'];
+
+function getFiles(dir, fileList = []) {
+  const files = fs.readdirSync(dir);
+  files.forEach(file => {
+    if (ignore.includes(file)) return;
+    const filePath = path.join(dir, file);
+    
+    if (fs.statSync(filePath).isDirectory()) {
+      getFiles(filePath, fileList);
+    } else {
+      const ext = path.extname(file).toLowerCase();
+      if (!skipExtensions.includes(ext)) {
+        fileList.push(filePath);
+      }
+    }
+  });
+  return fileList;
+}
+
+const allFiles = getFiles(projectRoot);
+let output = 'PROJECT CODE MAP (Assets Excluded)\n==================================\n\n';
+
+allFiles.forEach(file => {
+  output += `\n--- FILE: ${file} ---\n`;
+  try {
+    output += fs.readFileSync(file, 'utf8');
+  } catch (err) {
+    output += '[Could not read file]';
+  }
+  output += '\n\n';
+});
+
+fs.writeFileSync(outputFile, output);
+console.log(`Success! Your clean code map is saved in ${outputFile}`);
+
+
+--- FILE: lib/utils.ts ---
+import { clsx, type ClassValue } from 'clsx'
+import { twMerge } from 'tailwind-merge'
+
+export function cn(...inputs: ClassValue[]) {
+  return twMerge(clsx(inputs))
+}
+
+
+--- FILE: next-env.d.ts ---
+/// <reference types="next" />
+/// <reference types="next/image-types/global" />
+import "./.next/dev/types/routes.d.ts";
+
+// NOTE: This file should not be edited
+// see https://nextjs.org/docs/app/api-reference/config/typescript for more information.
+
+
+
+--- FILE: next.config.mjs ---
+/** @type {import('next').NextConfig} */
+const nextConfig = {};
+
+export default nextConfig;
+
+
+
+--- FILE: package.json ---
+{
+  "name": "project-renaissance",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
+  "dependencies": {
+    "@sanity/icons": "^3.7.4",
+    "@sanity/image-url": "^2.1.1",
+    "@sanity/vision": "^6.2.0",
+    "clsx": "^2.1.1",
+    "next": "^16.2.9",
+    "next-sanity": "^13.1.1",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
+    "sanity": "^6.2.0",
+    "styled-components": "^6.4.3",
+    "tailwind-merge": "^3.6.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20",
+    "@types/react": "^18",
+    "@types/react-dom": "^18",
+    "eslint": "^8",
+    "eslint-config-next": "14.2.35",
+    "postcss": "^8",
+    "tailwindcss": "^3.4.1",
+    "typescript": "^5"
+  }
+}
+
+
+
+--- FILE: postcss.config.mjs ---
+/** @type {import('postcss-load-config').Config} */
+const config = {
+  plugins: {
+    tailwindcss: {},
+  },
+};
+
+export default config;
+
+
+
+--- FILE: public/crest.jpg:Zone.Identifier ---
+[ZoneTransfer]
+ZoneId=3 
+
+
+--- FILE: public/school-building.jpg:Zone.Identifier ---
+[ZoneTransfer]
+ZoneId=3 
+
+
+--- FILE: sanity/env.ts ---
+export const apiVersion =
+  process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2026-06-29'
+
+export const dataset = assertValue(
+  process.env.NEXT_PUBLIC_SANITY_DATASET,
+  'Missing environment variable: NEXT_PUBLIC_SANITY_DATASET'
+)
+
+export const projectId = assertValue(
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  'Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID'
+)
+
+function assertValue<T>(v: T | undefined, errorMessage: string): T {
+  if (v === undefined) {
+    throw new Error(errorMessage)
+  }
+
+  return v
+}
+
+
+
+--- FILE: sanity/lib/client.ts ---
+import { createClient } from 'next-sanity'
+
+import { apiVersion, dataset, projectId } from '../env'
+
+export const client = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+})
+
+
+
+--- FILE: sanity/lib/image.ts ---
+import { createImageUrlBuilder, type SanityImageSource } from '@sanity/image-url'
+
+import { dataset, projectId } from '../env'
+
+// https://www.sanity.io/docs/image-url
+const builder = createImageUrlBuilder({ projectId, dataset })
+
+export const urlFor = (source: SanityImageSource) => {
+  return builder.image(source)
+}
+
+
+
+--- FILE: sanity/lib/live.ts ---
+// Querying with "sanityFetch" will keep content automatically updated
+// Before using it, import and render "<SanityLive />" in your layout, see
+// https://github.com/sanity-io/next-sanity#live-content-api for more information.
+import { defineLive } from "next-sanity/live";
+import { client } from './client'
+
+export const { sanityFetch, SanityLive } = defineLive({
+  client,
+});
+
+
+
+--- FILE: sanity/schemaTypes/admission.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const admission = defineType({
+  name: 'admission',
+  title: 'Admission Policy',
+  type: 'document',
+  fields: [
+    defineField({ name: 'stepTitle', title: 'Process Step', type: 'string' }),
+    defineField({ name: 'description', title: 'Details', type: 'text' }),
+    defineField({ name: 'requiredDocuments', title: 'Required Documents', type: 'array', of: [{ type: 'string' }] }),
+  ],
+})
+
+
+--- FILE: sanity/schemaTypes/index.ts ---
+import { siteSettings } from './siteSettings'
+import { policy } from './policy'
+import { admission } from './admission'
+
+export const schema = {
+  types: [siteSettings, policy, admission],
+}
+
+
+--- FILE: sanity/schemaTypes/notice.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const noticeType = defineType({
+  name: 'notice',
+  title: 'School Notice',
+  type: 'document',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Notice Title',
+      type: 'string',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'date',
+      title: 'Publish Date',
+      type: 'date',
+    }),
+    defineField({
+      name: 'details',
+      title: 'Details',
+      type: 'text',
+    }),
+  ],
+})
+
+
+--- FILE: sanity/schemaTypes/policy.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const policy = defineType({
+  name: 'policy',
+  title: 'School Policy',
+  type: 'document',
+  fields: [
+    defineField({ name: 'title', title: 'Policy Title', type: 'string' }),
+    defineField({ 
+      name: 'category', 
+      title: 'Category', 
+      type: 'string', 
+      options: { list: ['Discipline', 'Uniform', 'Attendance', 'Library', 'Bus'] } 
+    }),
+    defineField({ name: 'content', title: 'Policy Content', type: 'array', of: [{ type: 'block' }] }),
+  ],
+})
+
+
+--- FILE: sanity/schemaTypes/siteSettings.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const siteSettings = defineType({
+  name: 'siteSettings',
+  title: 'Site Settings',
+  type: 'document',
+  fields: [
+    defineField({ name: 'schoolName', title: 'School Name', type: 'string' }),
+    defineField({ name: 'phone', title: 'Phone Number', type: 'string' }),
+    defineField({ name: 'email', title: 'Official Email', type: 'string' }),
+    defineField({ name: 'address', title: 'Campus Address', type: 'text' }),
+    defineField({ name: 'officeHours', title: 'Office Hours', type: 'string' }),
+  ],
+})
+
+
+--- FILE: sanity/structure.ts ---
+import type {StructureResolver} from 'sanity/structure'
+
+// https://www.sanity.io/docs/structure-builder-cheat-sheet
+export const structure: StructureResolver = (S) =>
+  S.list()
+    .title('Content')
+    .items(S.documentTypeListItems())
+
+
+
+--- FILE: sanity.cli.ts ---
+/**
+* This configuration file lets you run `$ sanity [command]` in this folder
+* Go to https://www.sanity.io/docs/cli to learn more.
+**/
+import { defineCliConfig } from 'sanity/cli'
+
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+
+export default defineCliConfig({ api: { projectId, dataset } })
+
+
+
+--- FILE: sanity.config.ts ---
+'use client'
+
+/**
+ * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
+ */
+
+import {visionTool} from '@sanity/vision'
+import {defineConfig} from 'sanity'
+import {structureTool} from 'sanity/structure'
+
+// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
+import {apiVersion, dataset, projectId} from './sanity/env'
+import {schema} from './sanity/schemaTypes'
+import {structure} from './sanity/structure'
+
+export default defineConfig({
+  basePath: '/studio',
+  projectId,
+  dataset,
+  // Add and edit the content schema in the './sanity/schemaTypes' folder
+  schema,
+  plugins: [
+    structureTool({structure}),
+    // Vision is for querying with GROQ from inside the Studio
+    // https://www.sanity.io/docs/the-vision-plugin
+    visionTool({defaultApiVersion: apiVersion}),
+  ],
+})
+
+
+
+--- FILE: styles/globals.css ---
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-maroon:       #5C1A1A;
+  --color-gold:         #B8922A;
+  --color-parchment:    #F2EBD9;
+  --color-bay-blue:     #2C4A6E;
+  --color-stone-white:  #FAF7F2;
+  --color-charcoal:     #2A2420;
+  --color-sand:         #D4B896;
+  --color-vestment:     #8C7B6E;
+}
+
+body {
+  background-color: var(--color-parchment);
+  color: var(--color-charcoal);
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+--- FILE: tailwind.config.ts ---
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        maroon:      '#5C1A1A',
+        gold:        '#B8922A',
+        parchment:   '#F2EBD9',
+        'bay-blue':  '#2C4A6E',
+        'stone-white':'#FAF7F2',
+        charcoal:    '#2A2420',
+        sand:        '#D4B896',
+        vestment:    '#8C7B6E',
+        success:     '#2D6A4F',
+        warning:     '#92560A',
+        error:       '#9B1C1C',
+      },
+      fontFamily: {
+        display:       ['var(--font-garamond)', 'Georgia', 'serif'],
+        body:          ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        institutional: ['var(--font-cinzel)', 'serif'],
+      },
+      fontSize: {
+        'display': ['80px', { lineHeight: '1.0',  letterSpacing: '-0.02em'  }],
+        'h1':      ['60px', { lineHeight: '1.05', letterSpacing: '-0.015em' }],
+        'h2':      ['44px', { lineHeight: '1.15', letterSpacing: '-0.01em'  }],
+        'h3':      ['32px', { lineHeight: '1.25', letterSpacing: '0'        }],
+        'h4':      ['20px', { lineHeight: '1.35', letterSpacing: '0.01em'   }],
+        'h5':      ['17px', { lineHeight: '1.4',  letterSpacing: '0.01em'   }],
+        'pull':    ['26px', { lineHeight: '1.6',  letterSpacing: '0.01em'   }],
+        'body-lg': ['17px', { lineHeight: '1.75', letterSpacing: '0'        }],
+        'body':    ['15px', { lineHeight: '1.7',  letterSpacing: '0'        }],
+        'caption': ['13px', { lineHeight: '1.6',  letterSpacing: '0.02em'   }],
+        'label':   ['11px', { lineHeight: '1.5',  letterSpacing: '0.12em'   }],
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
+
+
+--- FILE: tsconfig.json ---
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
+
+
+--- FILE: types/index.ts ---
+
+
+
+
+
+--- FILE: public/crest.jpg:Zone.Identifier ---
+[ZoneTransfer]
+ZoneId=3 
+
+
+--- FILE: public/school-building.jpg:Zone.Identifier ---
+[ZoneTransfer]
+ZoneId=3 
+
+
+--- FILE: sanity/env.ts ---
+export const apiVersion =
+  process.env.NEXT_PUBLIC_SANITY_API_VERSION || '2026-06-29'
+
+export const dataset = assertValue(
+  process.env.NEXT_PUBLIC_SANITY_DATASET,
+  'Missing environment variable: NEXT_PUBLIC_SANITY_DATASET'
+)
+
+export const projectId = assertValue(
+  process.env.NEXT_PUBLIC_SANITY_PROJECT_ID,
+  'Missing environment variable: NEXT_PUBLIC_SANITY_PROJECT_ID'
+)
+
+function assertValue<T>(v: T | undefined, errorMessage: string): T {
+  if (v === undefined) {
+    throw new Error(errorMessage)
+  }
+
+  return v
+}
+
+
+
+--- FILE: sanity/lib/client.ts ---
+import { createClient } from 'next-sanity'
+
+import { apiVersion, dataset, projectId } from '../env'
+
+export const client = createClient({
+  projectId,
+  dataset,
+  apiVersion,
+  useCdn: true, // Set to false if statically generating pages, using ISR or tag-based revalidation
+})
+
+
+
+--- FILE: sanity/lib/image.ts ---
+import { createImageUrlBuilder, type SanityImageSource } from '@sanity/image-url'
+
+import { dataset, projectId } from '../env'
+
+// https://www.sanity.io/docs/image-url
+const builder = createImageUrlBuilder({ projectId, dataset })
+
+export const urlFor = (source: SanityImageSource) => {
+  return builder.image(source)
+}
+
+
+
+--- FILE: sanity/lib/live.ts ---
+// Querying with "sanityFetch" will keep content automatically updated
+// Before using it, import and render "<SanityLive />" in your layout, see
+// https://github.com/sanity-io/next-sanity#live-content-api for more information.
+import { defineLive } from "next-sanity/live";
+import { client } from './client'
+
+export const { sanityFetch, SanityLive } = defineLive({
+  client,
+});
+
+
+
+--- FILE: sanity/queries.ts ---
+// sanity/queries.ts
+export const siteSettingsQuery = `*[_type == "siteSettings"][0]`
+export const admissionQuery = `*[_type == "admission"] | order(_createdAt asc)`
+
+
+--- FILE: sanity/schemaTypes/admission.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const admission = defineType({
+  name: 'admission',
+  title: 'Admission Policy',
+  type: 'document',
+  fields: [
+    defineField({ name: 'stepTitle', title: 'Process Step', type: 'string' }),
+    defineField({ name: 'description', title: 'Details', type: 'text' }),
+    defineField({ name: 'requiredDocuments', title: 'Required Documents', type: 'array', of: [{ type: 'string' }] }),
+  ],
+})
+
+
+--- FILE: sanity/schemaTypes/index.ts ---
+import { siteSettings } from './siteSettings'
+import { policy } from './policy'
+import { admission } from './admission'
+
+export const schema = {
+  types: [siteSettings, policy, admission],
+}
+
+
+--- FILE: sanity/schemaTypes/notice.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const noticeType = defineType({
+  name: 'notice',
+  title: 'School Notice',
+  type: 'document',
+  fields: [
+    defineField({
+      name: 'title',
+      title: 'Notice Title',
+      type: 'string',
+      validation: (rule) => rule.required(),
+    }),
+    defineField({
+      name: 'date',
+      title: 'Publish Date',
+      type: 'date',
+    }),
+    defineField({
+      name: 'details',
+      title: 'Details',
+      type: 'text',
+    }),
+  ],
+})
+
+
+--- FILE: sanity/schemaTypes/policy.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const policy = defineType({
+  name: 'policy',
+  title: 'School Policy',
+  type: 'document',
+  fields: [
+    defineField({ name: 'title', title: 'Policy Title', type: 'string' }),
+    defineField({ 
+      name: 'category', 
+      title: 'Category', 
+      type: 'string', 
+      options: { list: ['Discipline', 'Uniform', 'Attendance', 'Library', 'Bus'] } 
+    }),
+    defineField({ name: 'content', title: 'Policy Content', type: 'array', of: [{ type: 'block' }] }),
+  ],
+})
+
+
+--- FILE: sanity/schemaTypes/siteSettings.ts ---
+import { defineField, defineType } from 'sanity'
+
+export const siteSettings = defineType({
+  name: 'siteSettings',
+  title: 'Site Settings',
+  type: 'document',
+  fields: [
+    defineField({ name: 'schoolName', title: 'School Name', type: 'string' }),
+    defineField({ name: 'phone', title: 'Phone Number', type: 'string' }),
+    defineField({ name: 'email', title: 'Official Email', type: 'string' }),
+    defineField({ name: 'address', title: 'Campus Address', type: 'text' }),
+    defineField({ name: 'officeHours', title: 'Office Hours', type: 'string' }),
+  ],
+})
+
+
+--- FILE: sanity/structure.ts ---
+import type {StructureResolver} from 'sanity/structure'
+
+// https://www.sanity.io/docs/structure-builder-cheat-sheet
+export const structure: StructureResolver = (S) =>
+  S.list()
+    .title('Content')
+    .items(S.documentTypeListItems())
+
+
+
+--- FILE: sanity.cli.ts ---
+/**
+* This configuration file lets you run `$ sanity [command]` in this folder
+* Go to https://www.sanity.io/docs/cli to learn more.
+**/
+import { defineCliConfig } from 'sanity/cli'
+
+const projectId = process.env.NEXT_PUBLIC_SANITY_PROJECT_ID
+const dataset = process.env.NEXT_PUBLIC_SANITY_DATASET
+
+export default defineCliConfig({ api: { projectId, dataset } })
+
+
+
+--- FILE: sanity.config.ts ---
+'use client'
+
+/**
+ * This configuration is used to for the Sanity Studio that’s mounted on the `/app/studio/[[...tool]]/page.tsx` route
+ */
+
+import {visionTool} from '@sanity/vision'
+import {defineConfig} from 'sanity'
+import {structureTool} from 'sanity/structure'
+
+// Go to https://www.sanity.io/docs/api-versioning to learn how API versioning works
+import {apiVersion, dataset, projectId} from './sanity/env'
+import {schema} from './sanity/schemaTypes'
+import {structure} from './sanity/structure'
+
+export default defineConfig({
+  basePath: '/studio',
+  projectId,
+  dataset,
+  // Add and edit the content schema in the './sanity/schemaTypes' folder
+  schema,
+  plugins: [
+    structureTool({structure}),
+    // Vision is for querying with GROQ from inside the Studio
+    // https://www.sanity.io/docs/the-vision-plugin
+    visionTool({defaultApiVersion: apiVersion}),
+  ],
+})
+
+
+
+--- FILE: styles/globals.css ---
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --color-maroon:       #5C1A1A;
+  --color-gold:         #B8922A;
+  --color-parchment:    #F2EBD9;
+  --color-bay-blue:     #2C4A6E;
+  --color-stone-white:  #FAF7F2;
+  --color-charcoal:     #2A2420;
+  --color-sand:         #D4B896;
+  --color-vestment:     #8C7B6E;
+}
+
+body {
+  background-color: var(--color-parchment);
+  color: var(--color-charcoal);
+  font-family: var(--font-inter), sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+
+--- FILE: tailwind.config.ts ---
+import type { Config } from 'tailwindcss'
+
+const config: Config = {
+  content: [
+    './app/**/*.{js,ts,jsx,tsx,mdx}',
+    './components/**/*.{js,ts,jsx,tsx,mdx}',
+  ],
+  theme: {
+    extend: {
+      colors: {
+        maroon:      '#5C1A1A',
+        gold:        '#B8922A',
+        parchment:   '#F2EBD9',
+        'bay-blue':  '#2C4A6E',
+        'stone-white':'#FAF7F2',
+        charcoal:    '#2A2420',
+        sand:        '#D4B896',
+        vestment:    '#8C7B6E',
+        success:     '#2D6A4F',
+        warning:     '#92560A',
+        error:       '#9B1C1C',
+      },
+      fontFamily: {
+        display:       ['var(--font-garamond)', 'Georgia', 'serif'],
+        body:          ['var(--font-inter)', 'system-ui', 'sans-serif'],
+        institutional: ['var(--font-cinzel)', 'serif'],
+      },
+      fontSize: {
+        'display': ['80px', { lineHeight: '1.0',  letterSpacing: '-0.02em'  }],
+        'h1':      ['60px', { lineHeight: '1.05', letterSpacing: '-0.015em' }],
+        'h2':      ['44px', { lineHeight: '1.15', letterSpacing: '-0.01em'  }],
+        'h3':      ['32px', { lineHeight: '1.25', letterSpacing: '0'        }],
+        'h4':      ['20px', { lineHeight: '1.35', letterSpacing: '0.01em'   }],
+        'h5':      ['17px', { lineHeight: '1.4',  letterSpacing: '0.01em'   }],
+        'pull':    ['26px', { lineHeight: '1.6',  letterSpacing: '0.01em'   }],
+        'body-lg': ['17px', { lineHeight: '1.75', letterSpacing: '0'        }],
+        'body':    ['15px', { lineHeight: '1.7',  letterSpacing: '0'        }],
+        'caption': ['13px', { lineHeight: '1.6',  letterSpacing: '0.02em'   }],
+        'label':   ['11px', { lineHeight: '1.5',  letterSpacing: '0.12em'   }],
+      },
+    },
+  },
+  plugins: [],
+}
+
+export default config
+
+
+--- FILE: tsconfig.json ---
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "paths": {
+      "@/*": [
+        "./*"
+      ]
+    },
+    "target": "ES2017"
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
+  ],
+  "exclude": [
+    "node_modules"
+  ]
+}
+
+
+
+--- FILE: types/index.ts ---
+
+
